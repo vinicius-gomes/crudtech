@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.validation.constraints.Size;
 import java.util.Objects;
 
 @Entity
@@ -19,6 +20,7 @@ public class User {
     private String email;
     private String name;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Size(min = 6)
     private String password;
     @Column(unique = true)
     private String username;

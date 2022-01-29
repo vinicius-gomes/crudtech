@@ -16,4 +16,10 @@ public class UserExceptionsAdvice {
         return exception.getMessage();
     }
 
+    @ResponseBody
+    @ExceptionHandler(UserValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    String userNotFoundHandler(UserValidationException exception){
+        return exception.getMessage();
+    }
 }

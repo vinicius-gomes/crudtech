@@ -1,9 +1,10 @@
 package com.crudtech.cadastrin.controller;
 
 import com.crudtech.cadastrin.exception.UserNotFoundException;
-import com.crudtech.cadastrin.helper.UserHelper;
+import com.crudtech.cadastrin.exception.UserValidationException;
 import com.crudtech.cadastrin.model.User;
 import com.crudtech.cadastrin.service.UserService;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,19 +13,18 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class UserController {
 
     private final UserService userService;
 
-    private final UserHelper userHelper;
-
-    UserController(UserService service, UserHelper userHelper) {
+    UserController(UserService service) {
         this.userService = service;
-        this.userHelper = userHelper;
     }
 
     @GetMapping("/users")
@@ -47,19 +47,24 @@ public class UserController {
     }
 
     @PostMapping("/users")
-    User post(@RequestBody User newUser) {
+    User post(@Valid @RequestBody User newUser, BindingResult result) {
+        if(result.hasErrors()){
+            throw new UserValidationException(result.getFieldErrors().stream().map(error -> error.getField() + " :" + error.getDefaultMessage()).collect(Collectors.joining(",")));
+        }
         return userService.create(newUser);
     }
 
     @PutMapping("/users/{id}")
-    User put(@RequestBody User newUser, @PathVariable Long id) {
+    User put(@Valid @RequestBody User newUser, @PathVariable Long id, BindingResult result) {
+        if(result.hasErrors()){
+            throw new UserValidationException(result.getFieldErrors().stream().map(error -> error.getField() + " :" + error.getDefaultMessage()).collect(Collectors.joining(",")));
+        }
+
         return userService.findById(id).map(user -> {
             user.setEmail(newUser.getEmail());
             user.setUsername(newUser.getUsername());
             user.setName(newUser.getName());
-            if (userHelper.isPasswordValid(newUser.getPassword())) {
-                user.setPassword(newUser.getPassword());
-            }
+            user.setPassword(newUser.getPassword());
             return userService.save(user);
         }).orElseThrow(() -> {
             throw new UserNotFoundException(id);

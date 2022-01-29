@@ -1,6 +1,6 @@
 package com.crudtech.cadastrin.service.impl;
 
-import com.crudtech.cadastrin.helper.UserHelper;
+import com.crudtech.cadastrin.exception.UserValidationException;
 import com.crudtech.cadastrin.model.User;
 import com.crudtech.cadastrin.repository.UserRepository;
 import com.crudtech.cadastrin.service.UserService;
@@ -14,11 +14,9 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final UserHelper userHelper;
 
-    UserServiceImpl(UserRepository userRepository, UserHelper userHelper) {
+    UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.userHelper = userHelper;
     }
 
     @Override
@@ -28,6 +26,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User newUser) {
+
+        if(usernameAndEmailTaken(newUser)){
+            throw new UserValidationException("Username and/or email already taken. Please check your credentials");
+        }
+
         newUser.setActive(true);
         return userRepository.save(newUser);
     }
@@ -42,4 +45,8 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(id).filter(User::isActive);
     }
 
+    private boolean usernameAndEmailTaken(User newUser) {
+        return userRepository.findAll().stream().anyMatch(user ->
+                user.getEmail().matches(newUser.getEmail()) && user.getUsername().matches(newUser.getUsername()));
+    }
 }
