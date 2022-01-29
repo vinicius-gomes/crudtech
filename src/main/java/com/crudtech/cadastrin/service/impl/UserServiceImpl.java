@@ -1,6 +1,5 @@
 package com.crudtech.cadastrin.service.impl;
 
-import com.crudtech.cadastrin.exception.UserValidationException;
 import com.crudtech.cadastrin.helper.UserHelper;
 import com.crudtech.cadastrin.model.User;
 import com.crudtech.cadastrin.repository.UserRepository;
@@ -29,10 +28,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User newUser) {
-        if(usernameAndEmailTaken(newUser) || !userHelper.isPasswordValid(newUser.getPassword())){
-            throw new UserValidationException();
-        }
-
         newUser.setActive(true);
         return userRepository.save(newUser);
     }
@@ -45,11 +40,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findById(Long id) {
         return userRepository.findById(id).filter(User::isActive);
-    }
-
-    private boolean usernameAndEmailTaken(User newUser) {
-        return userRepository.findAll().stream().anyMatch(user ->
-                user.getEmail().matches(newUser.getEmail()) && user.getUsername().matches(newUser.getUsername()));
     }
 
 }

@@ -3,6 +3,7 @@ package com.crudtech.cadastrin.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -14,10 +15,12 @@ public class User {
     @Id @GeneratedValue
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long id;
+    @Column(unique = true)
     private String email;
     private String name;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+    @Column(unique = true)
     private String username;
     @JsonProperty(defaultValue = "true", access = JsonProperty.Access.WRITE_ONLY)
     private boolean active;
