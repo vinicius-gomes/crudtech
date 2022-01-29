@@ -1,7 +1,5 @@
-package com.crudtech.cadastrin.controller;
+package com.crudtech.cadastrin.exception;
 
-import com.crudtech.cadastrin.exception.UserNotFoundException;
-import com.crudtech.cadastrin.exception.UserValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
