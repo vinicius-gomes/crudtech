@@ -27,6 +27,16 @@ public class User {
     @JsonProperty(defaultValue = "true", access = JsonProperty.Access.WRITE_ONLY)
     private boolean active;
 
+    public User(Long id, String email, String name, String password, String username, boolean active) {
+        this.id = id;
+        this.email = email;
+        this.name = name;
+        this.password = password;
+        this.username = username;
+        this.active = active;
+    }
+
+    public User(){}
 
     public Long getId() {
         return id;
@@ -89,5 +99,14 @@ public class User {
     @Override
     public int hashCode() {
         return Objects.hash(getId(), getEmail(), getName(), getPassword(), getUsername(), isActive());
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"email\":" + email +
+                ", \"name\":\"" + name + "\"" +
+                ", \"username\":\"" + username + "\"" +
+                "}";
     }
 }

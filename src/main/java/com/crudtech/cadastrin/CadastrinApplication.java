@@ -11,5 +11,4 @@ public class CadastrinApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CadastrinApplication.class, args);
 	}
-
 }

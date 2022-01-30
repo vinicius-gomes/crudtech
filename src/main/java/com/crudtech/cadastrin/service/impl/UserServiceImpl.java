@@ -26,7 +26,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User newUser) {
-
         if(usernameAndEmailTaken(newUser)){
             throw new UserValidationException("Username and/or email already taken. Please check your credentials");
         }
