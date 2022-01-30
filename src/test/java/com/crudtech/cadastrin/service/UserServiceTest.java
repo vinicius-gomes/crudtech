@@ -6,13 +6,8 @@ import com.crudtech.cadastrin.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,13 +42,13 @@ class UserServiceTest {
     @Test
     void create() {
         User actualUser = userService.create(user);
-        Assertions.assertEquals(actualUser, user);
+        Assertions.assertEquals(user, actualUser);
         Assertions.assertTrue(actualUser.isActive());
     }
 
     @Test
     void createFails() {
-        userService.create(user);
+        userRepository.save(user);
         UserValidationException exception = Assertions.assertThrows(UserValidationException.class, () -> {
             userService.create(user);
         });
