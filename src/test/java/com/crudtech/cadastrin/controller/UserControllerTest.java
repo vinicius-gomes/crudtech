@@ -11,14 +11,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,6 +33,7 @@ class UserControllerTest {
     List<User> users;
     String userString;
     String wrongUserString;
+    String updatedUserString;
     @Autowired
     ObjectMapper mapper;
     @Autowired
@@ -61,6 +61,15 @@ class UserControllerTest {
                 "\"active\":true" +
                 "}";
 
+        updatedUserString = "{" +
+                "\"id\":1," +
+                "\"email\":\"vin.felipe@gmail.com\"," +
+                "\"name\":\"Vinicius\"," +
+                "\"password\":\"123456\"," +
+                "\"username\":\"vini_gomes\"," +
+                "\"active\":true" +
+                "}";
+
         user.setActive(true);
         user.setUsername("vini_gomes");
         user.setName("Vinicius");
@@ -74,42 +83,62 @@ class UserControllerTest {
     @Test
     void all() throws Exception {
         given(this.userService.findAll()).willReturn(users);
-        this.mvc.perform(get("/users").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andExpect(content().json(String.valueOf(users)));
+        this.mvc.perform(MockMvcRequestBuilders.get("/users").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andExpect(content().json(String.valueOf(users)));
     }
 
     @Test
     void allFails() throws Exception {
         users.clear();
         given(this.userService.findAll()).willReturn(users);
-        this.mvc.perform(get("/users").accept(MediaType.APPLICATION_JSON)).andExpect(status().is4xxClientError()).andExpect(content().string("Could not find user"));
+        this.mvc.perform(MockMvcRequestBuilders.get("/users").accept(MediaType.APPLICATION_JSON)).andExpect(status().is4xxClientError()).andExpect(content().string("Could not find user"));
     }
 
     @Test
-    void getOne() throws Exception {
+    void get() throws Exception {
         given(this.userService.findById(1L)).willReturn(Optional.ofNullable(user));
-        this.mvc.perform(get("/users/1").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andExpect(content().json(String.valueOf(user)));
+        this.mvc.perform(MockMvcRequestBuilders.get("/users/1").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andExpect(content().json(String.valueOf(user)));
     }
 
     @Test
-    void getOneFails() throws Exception {
+    void getFails() throws Exception {
         given(this.userService.findById(1L)).willReturn(Optional.empty());
-        this.mvc.perform(get("/users/1").accept(MediaType.APPLICATION_JSON)).andExpect(status().is4xxClientError()).andExpect(content().string("Could not find user: 1"));
+        this.mvc.perform(MockMvcRequestBuilders.get("/users/1").accept(MediaType.APPLICATION_JSON)).andExpect(status().is4xxClientError()).andExpect(content().string("Could not find user: 1"));
     }
 
     @Test
-    void postOne() throws Exception {
+    void post() throws Exception {
         given(this.userService.create(user)).willReturn(user);
-        this.mvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(userString)).andExpect(status().isOk()).andExpect(content().json(String.valueOf(user)));
+        this.mvc.perform(MockMvcRequestBuilders.post("/users").contentType(MediaType.APPLICATION_JSON).content(userString)).andExpect(status().isOk()).andExpect(content().json(String.valueOf(user)));
     }
 
     @Test
-    void postOneFails() throws Exception {
-        this.mvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(wrongUserString)).andExpect(status().is4xxClientError()).andExpect(content().string("Validation error: password :size must be between 6 and 2147483647"));
+    void postFails() throws Exception {
+        this.mvc.perform(MockMvcRequestBuilders.post("/users").contentType(MediaType.APPLICATION_JSON).content(wrongUserString)).andExpect(status().is4xxClientError()).andExpect(content().string("Validation error: password :size must be between 6 and 2147483647"));
     }
 
     @Test
-    void put(){
-
+    void put() throws Exception {
+        given(this.userService.findById(1L)).willReturn(Optional.ofNullable(user));
+        given(this.userService.save(user)).willReturn(user);
+        this.mvc.perform(MockMvcRequestBuilders.put("/users/1").contentType(MediaType.APPLICATION_JSON).content(updatedUserString)).andExpect(status().isOk()).andExpect(content().json(String.valueOf(user)));
     }
 
+    @Test
+    void putFails() throws Exception {
+        given(this.userService.findById(1L)).willReturn(Optional.ofNullable(user));
+        given(this.userService.save(user)).willReturn(user);
+        this.mvc.perform(MockMvcRequestBuilders.put("/users/3").contentType(MediaType.APPLICATION_JSON).content(updatedUserString)).andExpect(status().is4xxClientError()).andExpect(content().string("Could not find user: 3"));
+    }
+
+    @Test
+    void delete() throws Exception {
+        given(this.userService.findById(1L)).willReturn(Optional.ofNullable(user));
+        this.mvc.perform(MockMvcRequestBuilders.delete("/users/1")).andExpect(status().isOk());
+    }
+
+    @Test
+    void deleteFails() throws Exception {
+        given(this.userService.findById(1L)).willReturn(Optional.empty());
+        this.mvc.perform(MockMvcRequestBuilders.delete("/users/1")).andExpect(status().is4xxClientError()).andExpect(content().string("Could not find user: 1"));
+    }
 }
