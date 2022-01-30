@@ -26,18 +26,18 @@ class UserControllerTest {
 
     @MockBean
     UserService userService;
-
     @MockBean
     UserRepository userRepository;
+    @Autowired
+    ObjectMapper mapper;
+    @Autowired
+    private MockMvc mvc;
+
     User user;
     List<User> users;
     String userString;
     String wrongUserString;
     String updatedUserString;
-    @Autowired
-    ObjectMapper mapper;
-    @Autowired
-    private MockMvc mvc;
 
     @BeforeEach
     void init() {

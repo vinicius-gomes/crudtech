@@ -29,7 +29,6 @@ public class UserServiceImpl implements UserService {
         if(usernameAndEmailTaken(newUser)){
             throw new UserValidationException("Username and/or email already taken. Please check your credentials");
         }
-
         newUser.setActive(true);
         return userRepository.save(newUser);
     }
