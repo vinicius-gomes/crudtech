@@ -4,6 +4,7 @@ import com.crudtech.cadastrin.exception.UserValidationException;
 import com.crudtech.cadastrin.model.User;
 import com.crudtech.cadastrin.repository.UserRepository;
 import com.crudtech.cadastrin.service.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,9 +15,11 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    UserServiceImpl(UserRepository userRepository) {
+    UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -29,6 +32,7 @@ public class UserServiceImpl implements UserService {
         if(usernameAndEmailTaken(newUser)){
             throw new UserValidationException("Username and/or email already taken. Please check your credentials");
         }
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
         newUser.setActive(true);
         return userRepository.save(newUser);
     }

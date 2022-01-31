@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@RequestMapping("/api/users")
 @RestController
 public class UserController {
 
@@ -27,7 +29,7 @@ public class UserController {
         this.userService = service;
     }
 
-    @GetMapping("/users")
+    @GetMapping
     List<User> all() {
         List<User> users = userService.findAll();
         if(users.isEmpty()){
@@ -36,7 +38,7 @@ public class UserController {
         return users;
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/{id}")
     User get(@PathVariable Long id) {
         Optional<User> user = userService.findById(id);
 
@@ -46,7 +48,7 @@ public class UserController {
         return user.get();
     }
 
-    @PostMapping("/users")
+    @PostMapping
     User post(@Valid @RequestBody User newUser, BindingResult result) {
         if(result.hasErrors()){
             throw new UserValidationException(result.getFieldErrors().stream().map(error -> error.getField() + " :" + error.getDefaultMessage()).collect(Collectors.joining(",")));
@@ -54,7 +56,7 @@ public class UserController {
         return userService.create(newUser);
     }
 
-    @PutMapping("/users/{id}")
+    @PutMapping("/{id}")
     User put(@Valid @RequestBody User newUser, @PathVariable Long id, BindingResult result) {
         if(result.hasErrors()){
             throw new UserValidationException(result.getFieldErrors().stream().map(error -> error.getField() + " :" + error.getDefaultMessage()).collect(Collectors.joining(",")));
@@ -71,7 +73,7 @@ public class UserController {
         });
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/{id}")
     void delete(@PathVariable Long id) {
         userService.findById(id).ifPresentOrElse(user -> {
             user.setActive(false);

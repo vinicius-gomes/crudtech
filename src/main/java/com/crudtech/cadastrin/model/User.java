@@ -13,6 +13,8 @@ import java.util.Objects;
 @Entity
 public class User {
 
+    public enum Role {USER, ADMIN, USER_MANAGER}
+
     @Id @GeneratedValue
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long id;
@@ -24,19 +26,18 @@ public class User {
     private String password;
     @Column(unique = true)
     private String username;
-    @JsonProperty(defaultValue = "true", access = JsonProperty.Access.WRITE_ONLY)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private boolean active;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Role role;
 
-    public User(Long id, String email, String name, String password, String username, boolean active) {
-        this.id = id;
-        this.email = email;
-        this.name = name;
-        this.password = password;
-        this.username = username;
-        this.active = active;
+    public Role getRole() {
+        return role;
     }
 
-    public User(){}
+    public void setRole(Role role) {
+        this.role = role;
+    }
 
     public Long getId() {
         return id;
