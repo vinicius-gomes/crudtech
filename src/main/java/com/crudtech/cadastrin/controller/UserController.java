@@ -4,7 +4,9 @@ import com.crudtech.cadastrin.exception.UserNotFoundException;
 import com.crudtech.cadastrin.exception.UserValidationException;
 import com.crudtech.cadastrin.model.User;
 import com.crudtech.cadastrin.service.UserService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 
 @RequestMapping("/api/users")
 @RestController
+@Validated
 public class UserController {
 
     private final UserService userService;
@@ -74,6 +77,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     void delete(@PathVariable Long id) {
         userService.findById(id).ifPresentOrElse(user -> {
             user.setActive(false);
